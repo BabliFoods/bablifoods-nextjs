@@ -19,7 +19,7 @@ function About() {
       <section className="py-16 px-4 text-center">
         <h2 className="text-3xl font-semibold text-gray-800 mb-4">Our Story</h2>
         <p className="text-lg max-w-3xl mx-auto mb-6">
-          At BabliFoods, we believe that snack time should be more than just eating – it should be an experience! We’ve created a brand that brings excitement and fun to every bite. Our playful, cartoon-style packaging is just the beginning – inside each bag, you'll find crispy, flavorful snacks that everyone loves. Join the BabliFoods family and make every snack an adventure.
+          At BabliFoods, we believe that snack time should be more than just eating – it should be an experience! We have created a brand that brings excitement and fun to every bite. Our playful, cartoon-style packaging is just the beginning – inside each bag, you'll find crispy, flavorful snacks that everyone loves. Join the BabliFoods family and make every snack an adventure.
         </p>
       </section>
 
