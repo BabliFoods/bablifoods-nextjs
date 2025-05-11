@@ -1,17 +1,18 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import products from "@/data/products" // Adjust path based on your structure
+import { useState } from 'react'
+import Image from 'next/image'
+import products from '@/data/products' // Adjust if needed
 
 export default function ProductPage() {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState('')
 
   const filteredProducts = products.filter((product) =>
-    product.title?.toLowerCase().includes(searchTerm.toLowerCase()) // Safeguard for undefined title
+    product.title?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
-    <main className="pt-24 py-6 px-6 max-w-screen-xl mx-auto font-sans text-gray-800 bg-gray-50">
+    <main className="pt-24 px-6 max-w-screen-xl mx-auto font-sans text-gray-800">
       <h1 className="text-3xl font-bold mb-6 text-center">Our Products</h1>
 
       {/* Search Bar */}
@@ -31,15 +32,16 @@ export default function ProductPage() {
           filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition"
+              className="bg-white rounded-2xl shadow p-4 flex flex-col items-center text-center hover:shadow-lg transition"
             >
-              <img
+              <Image
                 src={product.image}
                 alt={product.title}
-                className="w-32 h-32 object-contain mb-4"
+                width={128}
+                height={128}
+                className="object-contain mb-4"
               />
-              <h2 className="text-lg font-semibold mb-2">{product.title}</h2>
-              {/* Optionally, you can display the description */}
+              <h2 className="text-lg font-semibold">{product.title}</h2>
               <p className="text-sm text-gray-500">{product.description}</p>
             </div>
           ))

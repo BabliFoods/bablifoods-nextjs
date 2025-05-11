@@ -1,11 +1,12 @@
 'use client'
 
-import Image from 'next/image'
+import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 function About() {
   return (
-    <main className="text-gray-800 bg-gray-50 pt-16">
+    <main className="font-sans text-gray-800 bg-gray-50 pt-16">
 
       {/* Introduction Section */}
       <section className="bg-red-600 text-white py-16 px-4 text-center">
@@ -19,7 +20,7 @@ function About() {
       <section className="py-16 px-4 text-center">
         <h2 className="text-3xl font-semibold text-gray-800 mb-4">Our Story</h2>
         <p className="text-lg max-w-3xl mx-auto mb-6">
-          At BabliFoods, we believe that snack time should be more than just eating – it should be an experience! We have created a brand that brings excitement and fun to every bite. Our playful, cartoon-style packaging is just the beginning – inside each bag, you'll find crispy, flavorful snacks that everyone loves. Join the BabliFoods family and make every snack an adventure.
+          At BabliFoods, we believe that snack time should be more than just eating – it should be an experience! We&apos;ve created a brand that brings excitement and fun to every bite. Our playful, cartoon-style packaging is just the beginning – inside each bag, you&apos;ll find crispy, flavorful snacks that everyone loves. Join the BabliFoods family and make every snack an adventure.
         </p>
       </section>
 
@@ -35,13 +36,13 @@ function About() {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-10">
           {/* Image */}
-          <div className="flex-shrink-0 w-48 h-48 bg-gray-300 rounded-full overflow-hidden">
+          <div className="flex-shrink-0 w-48 h-48 rounded-full overflow-hidden bg-gray-300">
             <Image
               src="https://via.placeholder.com/150"
-              alt="Founder - Shekhar Nadar"
+              alt="Founder"
+              width={192}
+              height={192}
               className="object-cover w-full h-full"
-              width={150}
-              height={150}
             />
           </div>
 
@@ -59,7 +60,7 @@ function About() {
       <section className="bg-red-600 text-white py-16 px-4 text-center">
         <h2 className="text-3xl font-semibold mb-4">Get in Touch</h2>
         <p className="text-lg max-w-2xl mx-auto mb-6">
-          We’d love to hear from you! If you have any questions or want to learn more about BabliFoods, feel free to reach out.
+          We&apos;d love to hear from you! If you have any questions or want to learn more about BabliFoods, feel free to reach out.
         </p>
         <Link
           href="/contact"
