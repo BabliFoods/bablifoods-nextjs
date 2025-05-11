@@ -1,9 +1,11 @@
-import React from 'react'
+'use client'
+
+import Image from 'next/image'
 import Link from 'next/link'
 
 function About() {
   return (
-    <main className="font-sans text-gray-800 bg-gray-50 pt-16">
+    <main className="text-gray-800 bg-gray-50 pt-16">
 
       {/* Introduction Section */}
       <section className="bg-red-600 text-white py-16 px-4 text-center">
@@ -34,10 +36,12 @@ function About() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-10">
           {/* Image */}
           <div className="flex-shrink-0 w-48 h-48 bg-gray-300 rounded-full overflow-hidden">
-            <img
+            <Image
               src="https://via.placeholder.com/150"
-              alt="Founder"
+              alt="Founder - Shekhar Nadar"
               className="object-cover w-full h-full"
+              width={150}
+              height={150}
             />
           </div>
 
@@ -45,7 +49,7 @@ function About() {
           <div className="text-center md:text-left">
             <h2 className="text-3xl font-semibold text-gray-800 mb-4">About the Founder</h2>
             <p className="text-lg max-w-3xl">
-              BabliFoods was founded by <b>Shekhar Nadar</b>, a passionate foodie and entrepreneur who believes that snacks should be as exciting as they are delicious. With a vision to bring joy to snack time, [Founder Name] created BabliFoods with the goal of revolutionizing the snack industry with a focus on fun, flavor, and quality. Today, BabliFoods is a beloved brand, and its playful packaging and innovative snacks have made it a household name.
+              BabliFoods was founded by <b>Shekhar Nadar</b>, a passionate foodie and entrepreneur who believes that snacks should be as exciting as they are delicious. With a vision to bring joy to snack time, Shekhar created BabliFoods with the goal of revolutionizing the snack industry with a focus on fun, flavor, and quality. Today, BabliFoods is a beloved brand, and its playful packaging and innovative snacks have made it a household name.
             </p>
           </div>
         </div>
