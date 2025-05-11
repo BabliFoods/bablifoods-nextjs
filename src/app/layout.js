@@ -1,6 +1,7 @@
 import { Baloo_2 } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 
 const baloo = Baloo_2({
   subsets: ['latin'],
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
       <body className={`${baloo.className} antialiased`}>
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   )

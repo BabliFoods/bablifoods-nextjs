@@ -15,19 +15,17 @@ const Header = () => {
     <header className="fixed top-0 w-full z-50 bg-white shadow-md">
       <div className="container mx-auto flex justify-between items-center px-6 py-4 max-w-screen-xl">
         {/* Logo and Company Name */}
-        <div className="flex items-center space-x-2">
-          <Link href="/">
-            <img src="/images/bablifoods_logo.png" alt="BabliFoods Logo" className="h-10" />
-          </Link>
+        <Link href="/" className="flex items-center space-x-2" onClick={() => setNavbarOpen(false)}>
+          <img src="/images/bablifoods_logo.png" alt="BabliFoods Logo" className="h-10" />
           <span className="text-2xl font-bold text-black">BabliFoods</span>
-        </div>
+        </Link>
 
         {/* Desktop Menu */}
         <nav className="hidden lg:flex space-x-8">
           <Link href="/" className="text-black hover:text-red-600 transition duration-200">Home</Link>
-          <Link href="/about" className="text-black hover:text-red-600 transition duration-200">About</Link>
-          <Link href="/services" className="text-black hover:text-red-600 transition duration-200">Services</Link>
+          <Link href="/products" className="text-black hover:text-red-600 transition duration-200">Products</Link>
           <Link href="/contact" className="text-black hover:text-red-600 transition duration-200">Contact</Link>
+          <Link href="/about" className="text-black hover:text-red-600 transition duration-200">About</Link>
         </nav>
 
         {/* Mobile Hamburger Menu */}
@@ -58,10 +56,10 @@ const Header = () => {
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
             <ul className="space-y-4 text-center">
-              <li><Link href="/" className="text-black hover:text-red-600 transition duration-200">Home</Link></li>
-              <li><Link href="/products" className="text-black hover:text-red-600 transition duration-200">Products</Link></li>
-              <li><Link href="/contact" className="text-black hover:text-red-600 transition duration-200">Contact</Link></li>
-              <li><Link href="/about" className="text-black hover:text-red-600 transition duration-200">About</Link></li>
+              <li><Link href="/" onClick={() => setNavbarOpen(false)} className="text-black hover:text-red-600 transition duration-200">Home</Link></li>
+              <li><Link href="/products" onClick={() => setNavbarOpen(false)} className="text-black hover:text-red-600 transition duration-200">Products</Link></li>
+              <li><Link href="/contact" onClick={() => setNavbarOpen(false)} className="text-black hover:text-red-600 transition duration-200">Contact</Link></li>
+              <li><Link href="/about" onClick={() => setNavbarOpen(false)} className="text-black hover:text-red-600 transition duration-200">About</Link></li>
             </ul>
           </motion.div>
         )}

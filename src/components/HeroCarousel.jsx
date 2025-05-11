@@ -4,26 +4,26 @@ import { useState } from 'react'
 import Image from 'next/image'
 
 const slides = [
-  {
+    {
     id: 1,
-    title: 'Fryums Delight',
-    description: 'A crispy snack that’s full of fun and flavor.',
-    src: '/images/fryums.png',
-    backgroundColor: '#D11419',
-  },
-  {
-    id: 2,
-    title: 'Crunchy Corn',
-    description: 'Irresistibly crunchy corn kernels for the perfect snack.',
+    title: 'Babli Ka Jadoo',
+    description: 'Irresistibly crunchy kernels for the perfect snack.',
     src: '/images/jadoo.png',
     backgroundColor: '#0288C8',
   },
   {
+    id: 2,
+    title: 'Magic Fryums',
+    description: 'A crispy snack that’s full of fun and flavor.',
+    src: '/images/fryums.png',
+    backgroundColor: '#FABF39',
+  },
+  {
     id: 3,
-    title: 'Potato Poppers',
-    description: 'Crispy and tasty potato chips with a punch of flavor.',
+    title: 'Super Wheels',
+    description: 'Crispy and tasty potato wheels with a punch of flavor.',
     src: '/images/wheels.png',
-    backgroundColor: '#034A16',
+    backgroundColor: '#D8C44A',
   },
 ]
 

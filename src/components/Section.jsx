@@ -3,7 +3,8 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import Background from '../../public/images/shop.jpg'
+// import Background from '../../public/images/shop.jpg'
+import Background from '../../public/images/nacho_pattern.jpg'
 
 export default function ParallaxSection() {
   const containerRef = useRef(null)
@@ -14,6 +15,12 @@ export default function ParallaxSection() {
   })
 
   const y = useTransform(scrollYProgress, [0, 1], ['-10vh', '10vh'])
+
+  // Variants for text animation
+  const textVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  }
 
   return (
     <section
@@ -35,17 +42,43 @@ export default function ParallaxSection() {
         />
       </motion.div>
 
-      {/* Foreground Text Block */}
-      <div className="bg-white bg-opacity-90 p-6 md:p-16 rounded-2xl shadow-xl w-[80vw] md:w-[40vw] text-center">
-        <h1 className="text-3xl md:text-5xl font-bold text-gray-800 leading-tight">
+      {/* Foreground White Box */}
+      <div className="bg-white bg-opacity-90 p-6 md:p-16 shadow-xl w-[80vw] md:w-[30vw] text-center">
+        {/* Heading */}
+        <motion.h1
+          variants={textVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.5 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="text-3xl md:text-5xl font-bold text-gray-800 leading-tight"
+        >
           Welcome to BabliFoods
-        </h1>
-        <p className="mt-[5vh] md:mt-6 text-gray-600 text-base md:text-lg">
-          Step into a world where every snack is an adventure! From crispy fryums to crunchy corn, we bring you the best of fun and flavor. Our playful, cartoon-style packaging is just the beginning – inside each bag, you’ll find snacks that are as exciting as they are tasty. Join the BabliFoods family and make snack time a whole lot more fun!
-        </p>
+        </motion.h1>
 
+        {/* Paragraphs with staggered animation */}
+        <motion.p
+          variants={textVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.5 }}
+          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+          className="mt-[10vh] text-gray-600 text-base md:text-lg"
+        >
+          Step into a world where every snack is an adventure! From crispy fryums to crunchy corn, we bring you the best of fun and flavor.
+        </motion.p>
+
+        <motion.p
+          variants={textVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.5 }}
+          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.4 }}
+          className="text-gray-600 text-base md:text-lg"
+        >
+          Our playful, cartoon-style packaging is just the beginning – inside each bag, you’ll find snacks that are as exciting as they are tasty. Join the BabliFoods family and make snack time a whole lot more fun!
+        </motion.p>
       </div>
-
     </section>
   )
 }

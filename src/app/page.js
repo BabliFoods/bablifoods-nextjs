@@ -29,7 +29,7 @@ export default function Home() {
     // Hide loader after 3s
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 3000)
+    }, 1000)
 
     return () => {
       clearTimeout(timer)

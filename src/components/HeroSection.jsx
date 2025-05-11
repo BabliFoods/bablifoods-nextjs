@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform, useAnimation, useInView } from 'framer
 import Picture1 from '../../public/images/fryums.png'
 import Picture2 from '../../public/images/wheels.png'
 import Picture3 from '../../public/images/jadoo.png'
+import Link from 'next/link'  // Importing Link from Next.js for client-side navigation
 
 export default function HeroSection({ loading }) {
   const containerRef = useRef(null)
@@ -17,12 +18,12 @@ export default function HeroSection({ loading }) {
 
   const sm = useTransform(scrollYProgress, [0, 1], [0, -50])
   const md = useTransform(scrollYProgress, [0, 1], [0, -150])
-  const lg = useTransform(scrollYProgress, [0, 1], [0, -250])
+  const lg = useTransform(scrollYProgress, [0, 1], [0, -550])
 
   const images = [
     { src: Picture1, y: sm, className: 'top-[15vh] left-[5vw] h-[20vh] w-[15vh] md:h-[35vh] md:w-[25vh] z-[1]' },
-    { src: Picture2, y: lg, className: 'top-[40vh] right-[0vw] h-[15vh] w-[10vh] md:h-[40vh] md:w-[30vh] z-[2]' },
-    { src: Picture3, y: lg, className: 'top-[100vh] left-[30vw] h-[18vh] w-[14vh] md:h-[25vh] md:w-[20vh] z-[3]' },
+    { src: Picture2, y: md, className: 'top-[80vh] right-[0vw] h-[15vh] w-[10vh] md:h-[40vh] md:w-[30vh] z-[2]' },
+    { src: Picture3, y: lg, className: 'top-[120vh] left-[30vw] h-[18vh] w-[14vh] md:h-[25vh] md:w-[20vh] z-[3]' },
   ]
 
   const headingRef = useRef(null)
@@ -60,7 +61,7 @@ export default function HeroSection({ loading }) {
           },
         }}
       >
-        <motion.h1 className="text-white text-6xl md:text-6xl mb-4 leading-tight flex flex-wrap justify-center">
+        <motion.h1 className="text-white text-4xl md:text-6xl mb-4 leading-tight flex flex-wrap justify-center">
           {words.map((word, wordIndex) => (
             <motion.span
               key={wordIndex}
@@ -129,12 +130,19 @@ export default function HeroSection({ loading }) {
             },
           }}
         >
-          <button className="bg-white text-red-600 font-semibold px-6 py-2 rounded-full hover:bg-red-100 transition">
-            Explore Products
-          </button>
-          <button className="border border-white text-white font-semibold px-6 py-2 rounded-full hover:bg-white hover:text-red-600 transition">
-            Learn More
-          </button>
+          {/* Link wrapping the Explore Products Button */}
+          <Link href="/products">
+            <button className="bg-white text-red-600 font-semibold px-6 py-2 rounded-full hover:bg-red-100 transition">
+              Explore Products
+            </button>
+          </Link>
+
+          {/* Link wrapping the Learn More Button */}
+          <Link href="/about">
+            <button className="border border-white text-white font-semibold px-6 py-2 rounded-full hover:bg-white hover:text-red-600 transition">
+              Learn More
+            </button>
+          </Link>
         </motion.div>
       </motion.div>
 
