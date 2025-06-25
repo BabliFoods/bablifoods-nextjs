@@ -38,7 +38,7 @@ function About() {
           {/* Image */}
           <div className="flex-shrink-0 w-48 h-48 rounded-full overflow-hidden bg-gray-300">
             <Image
-              src="https://via.placeholder.com/150"
+              src="/images/bablifoods_logo.png"
               alt="Founder"
               width={192}
               height={192}
