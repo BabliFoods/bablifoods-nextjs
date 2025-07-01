@@ -1,33 +1,63 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { supabase } from "../../lib/supabaseClient"
-import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../../lib/supabaseClient'
+import { checkAdmin } from '../../lib/checkAdmin'
+import { motion, AnimatePresence } from 'framer-motion'
 
-export default function ProductsPage() {
+export default function AdminProductsPage() {
   const [products, setProducts] = useState([])
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
+  const [toastMessage, setToastMessage] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [session, setSession] = useState(null)
   const router = useRouter()
 
+  // AUTH CHECK
   useEffect(() => {
+    const authorize = async () => {
+      const session = await checkAdmin(router)
+      if (!session) return
+      setSession(session)
+      setLoading(false)
+    }
+
+    authorize()
+  }, [router])
+
+  // FETCH PRODUCTS
+  useEffect(() => {
+    if (!session) return
+
     const fetchProducts = async () => {
       const { data, error } = await supabase
-        .from("Product")
-        .select("*")
-        .order("name", { ascending: true })
+        .from('Product')
+        .select('*')
+        .order('name', { ascending: true })
 
-      if (error) console.error("Error fetching products:", error)
-      else setProducts(data)
+      if (error) {
+        console.error('Error fetching products:', error)
+      } else {
+        setProducts(data)
+      }
     }
 
     fetchProducts()
-  }, [])
+  }, [session])
 
   const handleEdit = (id) => {
     router.push(`/admin/edit-product/${id}`)
+  }
+
+  const handleAddProduct = () => {
+    router.push('/admin/add-product')
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
   }
 
   const confirmDelete = (product) => {
@@ -37,20 +67,46 @@ export default function ProductsPage() {
 
   const handleDeleteConfirmed = async () => {
     if (!selectedProduct) return
-    const { error } = await supabase.from("Product").delete().eq("id", selectedProduct.id)
-    if (error) {
-      console.error("Error deleting:", error)
-    } else {
-      setProducts(products.filter((p) => p.id !== selectedProduct.id))
-      setToastMessage(`"${selectedProduct.name}" was successfully deleted.`)
-      setTimeout(() => setToastMessage(""), 3000)
-      setShowConfirm(false)
-      setSelectedProduct(null)
+
+    // Extract image path from URL
+    try {
+      const imageUrl = selectedProduct.image_url
+      const bucket = 'product-images'
+      const path = imageUrl.split(`${bucket}/`)[1]
+
+      // Delete image from bucket
+      if (path) {
+        const { error: storageError } = await supabase.storage
+          .from(bucket)
+          .remove([path])
+
+        if (storageError) {
+          console.error('Error deleting image:', storageError)
+        }
+      }
+
+      // Delete product from DB
+      const { error: dbError } = await supabase
+        .from('Product')
+        .delete()
+        .eq('id', selectedProduct.id)
+
+      if (dbError) {
+        console.error('Error deleting product:', dbError)
+      } else {
+        setProducts(products.filter((p) => p.id !== selectedProduct.id))
+        setToastMessage(`"${selectedProduct.name}" was successfully deleted.`)
+        setTimeout(() => setToastMessage(''), 3000)
+        setShowConfirm(false)
+        setSelectedProduct(null)
+      }
+    } catch (err) {
+      console.error('Deletion error:', err)
     }
   }
 
-  const handleAddProduct = () => {
-    router.push("/admin/add-product")
+  if (loading) {
+    return <div className="p-8 text-center">Loading...</div>
   }
 
   return (
@@ -76,20 +132,27 @@ export default function ProductsPage() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-4xl font-bold text-gray-800">Product Dashboard</h1>
-        <button
-          onClick={handleAddProduct}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm transition"
-        >
-          <span className="text-sm font-semibold">Add Product</span>
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleAddProduct}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm text-sm font-semibold"
+          >
+            Add Product
+          </button>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
-      {/* Table */}
+      {/* Product Table */}
       <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-100 text-gray-700 font-semibold">
             <tr>
-              {/* ID column hidden */}
               <th className="px-6 py-4 text-left">Image</th>
               <th className="px-6 py-4 text-left">Name</th>
               <th className="px-6 py-4 text-left">Category</th>
@@ -112,10 +175,9 @@ export default function ProductsPage() {
                   show: { opacity: 1, y: 0 },
                 }}
                 className={`${
-                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                 } hover:bg-gray-100 transition`}
               >
-                {/* ID is available in code but not rendered */}
                 <td className="px-6 py-4">
                   <img
                     src={product.image_url}
@@ -162,15 +224,10 @@ export default function ProductsPage() {
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center"
             >
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                Delete Product
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">Delete Product</h2>
               <p className="text-gray-600 mb-4">
-                Are you sure you want to permanently delete{" "}
-                <span className="font-medium text-red-600">
-                  {selectedProduct?.name}
-                </span>
-                ?
+                Are you sure you want to permanently delete{' '}
+                <span className="font-medium text-red-600">{selectedProduct?.name}</span>?
               </p>
               <div className="flex justify-center gap-4">
                 <button

@@ -1,17 +1,27 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { supabase } from "../../../lib/supabaseClient"
-import { motion } from "framer-motion"
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../../../lib/supabaseClient'
+import { checkAdmin } from '../../../lib/checkAdmin'
+import { motion } from 'framer-motion'
 
 export default function AddProductPage() {
-  const [name, setName] = useState("")
-  const [category, setCategory] = useState("")
+  const [name, setName] = useState('')
+  const [category, setCategory] = useState('')
   const [imageFile, setImageFile] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState("")
+  const [previewUrl, setPreviewUrl] = useState('')
   const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
   const router = useRouter()
+
+  useEffect(() => {
+    const protect = async () => {
+      await checkAdmin(router)
+    }
+    protect()
+  }, [router])
 
   const handleImageChange = (e) => {
     const file = e.target.files[0]
@@ -24,51 +34,56 @@ export default function AddProductPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setErrorMessage('')
 
-    let imageUrl = ""
-
-    if (imageFile) {
-      const fileExt = imageFile.name.split(".").pop()
-
-      // Convert product name to PascalCase, remove special characters
-      const sanitizedProductName = name
-        .trim()
-        .replace(/[^a-zA-Z0-9 ]+/g, "") // remove special chars
-        .split(" ")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join("")
-
-      const fileName = sanitizedProductName
-        ? `${sanitizedProductName}.${fileExt}`
-        : `${Date.now()}.${fileExt}`
-
-      const { data, error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, imageFile)
-
-      if (uploadError) {
-        console.error("Image upload error:", uploadError)
-        setLoading(false)
-        return
-      }
-
-      const { data: publicUrlData } = supabase.storage
-        .from("product-images")
-        .getPublicUrl(fileName)
-
-      imageUrl = publicUrlData.publicUrl
+    if (!imageFile || !name || !category) {
+      setErrorMessage('All fields including image are required.')
+      setLoading(false)
+      return
     }
 
-    const { error } = await supabase
-      .from("Product")
+    let imageUrl = ''
+    const fileExt = imageFile.name.split('.').pop()
+
+    const sanitizedProductName = name
+      .trim()
+      .replace(/[^a-zA-Z0-9 ]+/g, '')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('')
+
+    const fileName = sanitizedProductName
+      ? `${sanitizedProductName}.${fileExt}`
+      : `${Date.now()}.${fileExt}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(fileName, imageFile)
+
+    if (uploadError) {
+      console.error('Image upload error:', uploadError)
+      setErrorMessage('Failed to upload image.')
+      setLoading(false)
+      return
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(fileName)
+
+    imageUrl = publicUrlData.publicUrl
+
+    const { error: insertError } = await supabase
+      .from('Product')
       .insert([{ name, category, image_url: imageUrl }])
 
     setLoading(false)
 
-    if (error) {
-      console.error("Add product error:", error)
+    if (insertError) {
+      console.error('Add product error:', insertError)
+      setErrorMessage('Something went wrong.')
     } else {
-      router.push("/admin/")
+      router.push('/admin')
     }
   }
 
@@ -97,7 +112,6 @@ export default function AddProductPage() {
           className="w-full px-4 py-2 border rounded-lg"
         />
 
-        {/* File input styled as a button */}
         <div className="flex items-center space-x-4">
           <label className="bg-gray-100 px-4 py-2 border rounded cursor-pointer hover:bg-gray-200 transition">
             Choose Image
@@ -109,9 +123,9 @@ export default function AddProductPage() {
               className="hidden"
             />
           </label>
-          {imageFile && (
-            <span className="text-sm text-gray-600 truncate max-w-xs">{imageFile.name}</span>
-          )}
+          <span className="text-sm text-gray-600 truncate max-w-xs">
+            {imageFile ? imageFile.name : 'No image selected'}
+          </span>
         </div>
 
         {previewUrl && (
@@ -129,12 +143,16 @@ export default function AddProductPage() {
           </motion.div>
         )}
 
+        {errorMessage && (
+          <div className="text-red-600 text-sm font-medium">{errorMessage}</div>
+        )}
+
         <button
           type="submit"
           disabled={loading}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
         >
-          {loading ? "Adding..." : "Add Product"}
+          {loading ? 'Adding...' : 'Add Product'}
         </button>
       </form>
     </motion.div>
