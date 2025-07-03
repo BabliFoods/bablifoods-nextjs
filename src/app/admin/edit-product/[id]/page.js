@@ -6,6 +6,21 @@ import { supabase } from "../../../../lib/supabaseClient"
 import { checkAdmin } from "../../../../lib/checkAdmin"
 import { motion } from "framer-motion"
 
+// Convert string to Title Case
+function toTitleCase(str) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ")
+}
+
+// Remove special characters from filename
+function sanitizeFilename(name) {
+  return name.replace(/[^a-zA-Z0-9]+/g, "")
+}
+
 export default function EditProductPage() {
   const { id } = useParams()
   const router = useRouter()
@@ -14,6 +29,7 @@ export default function EditProductPage() {
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState("")
   const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     const protect = async () => {
@@ -30,8 +46,9 @@ export default function EditProductPage() {
         .eq("id", id)
         .single()
 
-      if (error) console.error("Fetch error:", error)
-      else {
+      if (error) {
+        console.error("Fetch error:", error)
+      } else {
         setProduct(data)
         setPreviewUrl(data?.image_url || "")
       }
@@ -41,7 +58,7 @@ export default function EditProductPage() {
   }, [id])
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files?.[0]
     if (file) {
       setImageFile(file)
       setPreviewUrl(URL.createObjectURL(file))
@@ -51,66 +68,115 @@ export default function EditProductPage() {
   const handleRemoveImage = () => {
     setImageFile(null)
     setPreviewUrl("")
-    setProduct({ ...product, image_url: "" })
+    setProduct((prev) => ({ ...prev, image_url: "" }))
   }
 
   const handleUpdate = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setErrorMessage("")
+
+    const newName = toTitleCase(product.name.trim())
+    const newCategory = toTitleCase(product.category.trim())
+    const oldImagePath = product.image_url?.split("/product-images/")[1] || null
+
+    // Check for duplicate product name
+    const { data: existingProducts, error: nameCheckError } = await supabase
+      .from("Product")
+      .select("id")
+      .eq("name", newName)
+
+    if (nameCheckError) {
+      setErrorMessage("Error checking product name.")
+      setLoading(false)
+      return
+    }
+
+    const isDuplicate = existingProducts.some((p) => p.id !== id)
+    if (isDuplicate) {
+      setErrorMessage("Another product with this name already exists.")
+      setLoading(false)
+      return
+    }
 
     let imageUrl = product.image_url
 
-    // If new file selected, upload it
+    // IMAGE CHANGED
     if (imageFile) {
-      const fileExt = imageFile.name.split(".").pop()
+      const ext = imageFile.name.split(".").pop()
+      const cleanName = sanitizeFilename(newName)
+      const newFilename = `${cleanName}.${ext}`
 
-      const sanitizedProductName = product.name
-        .trim()
-        .replace(/[^a-zA-Z0-9 ]+/g, "")
-        .split(" ")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join("")
-
-      const fileName = sanitizedProductName
-        ? `${sanitizedProductName}.${fileExt}`
-        : `${Date.now()}.${fileExt}`
-
-      // Delete old image if it exists and is in the bucket
-      if (product.image_url && product.image_url.includes("product-images")) {
-        const path = product.image_url.split("/product-images/")[1]
-        await supabase.storage.from("product-images").remove([path])
+      if (oldImagePath) {
+        await supabase.storage.from("product-images").remove([oldImagePath])
       }
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
-        .upload(fileName, imageFile)
+        .upload(newFilename, imageFile, { upsert: true })
 
       if (uploadError) {
-        console.error("Image upload error:", uploadError)
+        setErrorMessage("Failed to upload image.")
         setLoading(false)
         return
       }
 
       const { data: publicUrlData } = supabase.storage
         .from("product-images")
-        .getPublicUrl(fileName)
+        .getPublicUrl(newFilename)
 
       imageUrl = publicUrlData.publicUrl
     }
 
-    const { error } = await supabase
+    // NAME CHANGED ONLY
+    else if (newName !== product.name && oldImagePath) {
+      const ext = oldImagePath.split(".").pop()
+      const cleanName = sanitizeFilename(newName)
+      const newFilename = `${cleanName}.${ext}`
+
+      const { data: fileData, error: downloadError } = await supabase.storage
+        .from("product-images")
+        .download(oldImagePath)
+
+      if (downloadError) {
+        setErrorMessage("Could not rename image.")
+        setLoading(false)
+        return
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(newFilename, fileData, { upsert: true })
+
+      if (uploadError) {
+        setErrorMessage("Failed to rename image.")
+        setLoading(false)
+        return
+      }
+
+      await supabase.storage.from("product-images").remove([oldImagePath])
+
+      const { data: publicUrlData } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(newFilename)
+
+      imageUrl = publicUrlData.publicUrl
+    }
+
+    // FINAL DB UPDATE
+    const { error: updateError } = await supabase
       .from("Product")
       .update({
-        name: product.name,
-        category: product.category,
+        name: newName,
+        category: newCategory,
         image_url: imageUrl,
       })
       .eq("id", id)
 
     setLoading(false)
 
-    if (error) {
-      console.error("Update error:", error)
+    if (updateError) {
+      setErrorMessage("Failed to update the product.")
     } else {
       router.push("/admin/")
     }
@@ -179,6 +245,10 @@ export default function EditProductPage() {
           </motion.div>
         ) : (
           <p className="text-sm text-gray-500">No image selected</p>
+        )}
+
+        {errorMessage && (
+          <div className="text-red-600 text-sm font-medium">{errorMessage}</div>
         )}
 
         <button

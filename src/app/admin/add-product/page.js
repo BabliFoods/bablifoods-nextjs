@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -42,6 +42,25 @@ export default function AddProductPage() {
       return
     }
 
+    // Check if product name already exists
+    const { data: existing, error: fetchError } = await supabase
+      .from('Product')
+      .select('id')
+      .eq('name', name.trim())
+
+    if (fetchError) {
+      console.error('Fetch error:', fetchError)
+      setErrorMessage('Error checking existing products.')
+      setLoading(false)
+      return
+    }
+
+    if (existing.length > 0) {
+      setErrorMessage('A product with this name already exists.')
+      setLoading(false)
+      return
+    }
+
     let imageUrl = ''
     const fileExt = imageFile.name.split('.').pop()
 
@@ -56,13 +75,14 @@ export default function AddProductPage() {
       ? `${sanitizedProductName}.${fileExt}`
       : `${Date.now()}.${fileExt}`
 
+    // Upload with overwrite support
     const { error: uploadError } = await supabase.storage
       .from('product-images')
-      .upload(fileName, imageFile)
+      .upload(fileName, imageFile, { upsert: true })
 
     if (uploadError) {
       console.error('Image upload error:', uploadError)
-      setErrorMessage('Failed to upload image.')
+      setErrorMessage('Failed to upload image. Try a different file.')
       setLoading(false)
       return
     }
@@ -75,13 +95,13 @@ export default function AddProductPage() {
 
     const { error: insertError } = await supabase
       .from('Product')
-      .insert([{ name, category, image_url: imageUrl }])
+      .insert([{ name: name.trim(), category: category.trim(), image_url: imageUrl }])
 
     setLoading(false)
 
     if (insertError) {
-      console.error('Add product error:', insertError)
-      setErrorMessage('Something went wrong.')
+      console.error('Insert error:', insertError)
+      setErrorMessage('Something went wrong while adding the product.')
     } else {
       router.push('/admin')
     }
