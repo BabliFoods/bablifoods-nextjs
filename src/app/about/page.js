@@ -50,7 +50,7 @@ function About() {
           <div className="text-center md:text-left">
             <h2 className="text-3xl font-semibold text-gray-800 mb-4">About the Founder</h2>
             <p className="text-lg max-w-3xl">
-              BabliFoods was founded by <b>Shekhar Nadar</b>, a passionate foodie and entrepreneur who believes that snacks should be as exciting as they are delicious. With a vision to bring joy to snack time, Shekhar created BabliFoods with the goal of revolutionizing the snack industry with a focus on fun, flavor, and quality. Today, BabliFoods is a beloved brand, and its playful packaging and innovative snacks have made it a household name.
+              BabliFoods was founded by <b>Shekar Nadar</b>, a passionate foodie and entrepreneur who believes that snacks should be as exciting as they are delicious. With a vision to bring joy to snack time, Shekar created BabliFoods with the goal of revolutionizing the snack industry with a focus on fun, flavor, and quality. Today, BabliFoods is a beloved brand, and its playful packaging and innovative snacks have made it a household name.
             </p>
           </div>
         </div>
